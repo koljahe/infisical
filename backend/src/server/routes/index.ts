@@ -318,6 +318,8 @@ import { folderCommitServiceFactory } from "@app/services/folder-commit/folder-c
 import { folderCommitChangesDALFactory } from "@app/services/folder-commit-changes/folder-commit-changes-dal";
 import { folderTreeCheckpointDALFactory } from "@app/services/folder-tree-checkpoint/folder-tree-checkpoint-dal";
 import { folderTreeCheckpointResourcesDALFactory } from "@app/services/folder-tree-checkpoint-resources/folder-tree-checkpoint-resources-dal";
+import { gitHubAppDALFactory } from "@app/services/github-app/github-app-dal";
+import { gitHubAppServiceFactory } from "@app/services/github-app/github-app-service";
 import { groupProjectDALFactory } from "@app/services/group-project/group-project-dal";
 import { groupProjectServiceFactory } from "@app/services/group-project/group-project-service";
 import { healthAlertServiceFactory } from "@app/services/health-alert/health-alert-queue";
@@ -704,6 +706,7 @@ export const registerRoutes = async (
   const gatewayDAL = gatewayDALFactory(db);
   const secretReminderRecipientsDAL = secretReminderRecipientsDALFactory(db);
   const githubOrgSyncDAL = githubOrgSyncDALFactory(db);
+  const gitHubAppDAL = gitHubAppDALFactory(db);
   const honeyTokenConfigDAL = honeyTokenConfigDALFactory(db);
   const honeyTokenDAL = honeyTokenDALFactory(db);
   const honeyTokenEventDAL = honeyTokenEventDALFactory(db);
@@ -1012,6 +1015,12 @@ export const registerRoutes = async (
     orgMembershipDAL,
     membershipRoleDAL,
     membershipGroupDAL
+  });
+
+  const gitHubAppService = gitHubAppServiceFactory({
+    gitHubAppDAL,
+    permissionService,
+    kmsService
   });
 
   // ldapService is created after loginService (below) due to dependency on processProviderCallback
@@ -3568,6 +3577,7 @@ export const registerRoutes = async (
     insights: insightsService,
     pamInsights: pamInsightsService,
     githubOrgSync: githubOrgSyncConfigService,
+    gitHubApp: gitHubAppService,
     honeyTokenConfig: honeyTokenConfigService,
     honeyToken: honeyTokenService,
     folderCommit: folderCommitService,
