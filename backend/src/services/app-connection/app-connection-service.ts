@@ -37,6 +37,7 @@ import {
   TRANSITION_CONNECTION_CREDENTIALS_TO_PLATFORM,
   validateAppConnectionCredentials
 } from "@app/services/app-connection/app-connection-fns";
+import { TGitHubAppDALFactory } from "@app/services/github-app/github-app-dal";
 import { TIdentityUaDALFactory } from "@app/services/identity-ua/identity-ua-dal";
 import { TKmsServiceFactory } from "@app/services/kms/kms-service";
 import { TProjectDALFactory } from "@app/services/project/project-dal";
@@ -182,6 +183,7 @@ export type TAppConnectionServiceFactoryDep = {
   projectDAL: Pick<TProjectDALFactory, "findProjectById">;
   appConnectionCredentialRotationService: TAppConnectionCredentialRotationServiceFactory;
   identityUaDAL: Pick<TIdentityUaDALFactory, "findOne">;
+  gitHubAppDAL: Pick<TGitHubAppDALFactory, "findOne">;
 };
 
 export type TAppConnectionServiceFactory = ReturnType<typeof appConnectionServiceFactory>;
@@ -267,7 +269,8 @@ export const appConnectionServiceFactory = ({
   gatewayV2DAL,
   projectDAL,
   appConnectionCredentialRotationService,
-  identityUaDAL
+  identityUaDAL,
+  gitHubAppDAL
 }: TAppConnectionServiceFactoryDep) => {
   const listAppConnections = async (actor: OrgServiceActor, app?: AppConnection, projectId?: string) => {
     let appConnections: TAppConnections[];
@@ -534,7 +537,7 @@ export const appConnectionServiceFactory = ({
       } as TAppConnectionConfig,
       gatewayService,
       gatewayV2Service,
-      { identityUaDAL }
+      { identityUaDAL, gitHubAppDAL, kmsService }
     );
 
     try {
@@ -766,7 +769,7 @@ export const appConnectionServiceFactory = ({
         } as TAppConnectionConfig,
         gatewayService,
         gatewayV2Service,
-        { identityUaDAL }
+        { identityUaDAL, gitHubAppDAL, kmsService }
       );
 
       if (!updatedCredentials)
@@ -1186,7 +1189,10 @@ export const appConnectionServiceFactory = ({
     listAvailableAppConnectionsForUser,
     findAppConnectionUsageById,
     triggerCredentialRotation,
-    github: githubConnectionService(connectAppConnectionById, gatewayService, gatewayV2Service, gatewayPoolService),
+    github: githubConnectionService(connectAppConnectionById, gatewayService, gatewayV2Service, gatewayPoolService, {
+      gitHubAppDAL,
+      kmsService
+    }),
     githubRadar: githubRadarConnectionService(connectAppConnectionById),
     gcp: gcpConnectionService(connectAppConnectionById),
     databricks: databricksConnectionService(connectAppConnectionById, appConnectionDAL, kmsService),
