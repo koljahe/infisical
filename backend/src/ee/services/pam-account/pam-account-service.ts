@@ -822,10 +822,10 @@ export const pamAccountServiceFactory = ({
       accountName: accountIdentity
     };
 
-    const canAccess = await fac.canAccess(approvalRequestGrantsDAL, resource.projectId, actor.id, inputs);
+    const activeGrant = await fac.canAccess(approvalRequestGrantsDAL, resource.projectId, actor.id, inputs);
 
     // Grant does not exist, check policy and fallback to permission check
-    if (!canAccess) {
+    if (!activeGrant) {
       const policy = await fac.matchPolicy(approvalPolicyDAL, resource.projectId, inputs);
 
       if (policy) {
@@ -873,6 +873,16 @@ export const pamAccountServiceFactory = ({
           metadata: accountMeta[account.id] || []
         })
       );
+    }
+
+    // Cap the requested duration to the grant's remaining lifetime
+    let effectiveDuration = duration;
+    if (activeGrant?.expiresAt) {
+      const grantRemainingMs = activeGrant.expiresAt.getTime() - Date.now();
+      if (grantRemainingMs <= 0) {
+        throw new ForbiddenRequestError({ message: "Approval grant has expired" });
+      }
+      effectiveDuration = Math.min(duration, grantRemainingMs);
     }
 
     // Reason check is intentionally placed after the approval/permission gates so
@@ -1060,7 +1070,7 @@ export const pamAccountServiceFactory = ({
       selectedResourceId: isDomainAccount ? resource.id : null,
       userId: actor.id,
       gatewayId,
-      expiresAt: new Date(Date.now() + duration),
+      expiresAt: new Date(Date.now() + effectiveDuration),
       reason: trimmedReason
     });
 
@@ -1086,7 +1096,7 @@ export const pamAccountServiceFactory = ({
 
     const gatewayConnectionDetails = await gatewayV2Service.getPAMConnectionDetails({
       gatewayId,
-      duration,
+      duration: effectiveDuration,
       sessionId: session.id,
       resourceType: resource.resourceType as PamResource,
       host,
