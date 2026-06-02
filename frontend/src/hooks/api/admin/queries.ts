@@ -26,6 +26,7 @@ export const adminStandaloneKeys = {
 };
 
 export const adminQueryKeys = {
+  serverVersion: () => ["server-version"] as const,
   serverConfig: () => ["server-config"] as const,
   getUsers: (filters: AdminGetUsersFilters) => [adminStandaloneKeys.getUsers, { filters }] as const,
   getOrganizations: (filters?: AdminGetOrganizationsFilters) =>
@@ -183,5 +184,22 @@ export const useAdminGetEmailDomains = (filters: AdminGetEmailDomainsFilters) =>
       return { emailDomains: data.emailDomains, totalCount: data.total };
     },
     placeholderData: (previousData) => previousData
+  });
+};
+
+export type TServerVersion = {
+  version: string;
+  buildTimestamp: string;
+  nodeVersion: string;
+};
+
+export const useGetServerVersion = () => {
+  return useQuery({
+    queryKey: adminQueryKeys.serverVersion(),
+    queryFn: async () => {
+      const { data } = await apiRequest.get<TServerVersion>("/api/status/version");
+      return data;
+    },
+    staleTime: Infinity
   });
 };
