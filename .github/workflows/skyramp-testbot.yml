@@ -37,12 +37,28 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.skyramp-testbot-app-token.outputs.token }}
 
+      - name: Create .env for SUT
+        run: |
+          cat > .env << 'ENVEOF'
+          ENCRYPTION_KEY=4bnfe4gKJ0Lh0PkPHMjpSH+FRJxGpMV1VpMOE1VDgnM=
+          AUTH_SECRET=5lrMXKKWCVocS/uerPsl7V+TX/aaUaI7iDkgl3tSmLE=
+          SITE_URL=http://localhost:8080
+          REDIS_URL=redis://redis:6379
+          DB_CONNECTION_URI=postgres://infisical:infisical@db/infisical?sslmode=disable
+          SMTP_HOST=localhost
+          SMTP_PORT=1025
+          SMTP_FROM_ADDRESS=dev@infisical.local
+          SMTP_FROM_NAME=Infisical
+          TELEMETRY_ENABLED=false
+          ENVEOF
+          sed -i 's/^          //' .env
+
       - uses: skyramp/testbot@7054923f058e1fac3b92925fa475288c733cfea7 # v0.9.4
         with:
           skyrampLicenseFile: ${{ secrets.SKYRAMP_LICENSE_FILE }}
           anthropicApiKey: ${{ secrets.SKYRAMP_TESTBOT_API_KEY }}
           githubToken: ${{ steps.skyramp-testbot-app-token.outputs.token }}
-          targetSetupCommand: 'touch .env && docker compose -f docker-compose.bdd.yml up -d --build'
+          targetSetupCommand: 'docker compose -f docker-compose.bdd.yml up -d --build'
           targetReadyCheckCommand: 'curl -sf http://localhost:8080/api/status'
           targetReadyCheckTimeout: '300'
           targetTeardownCommand: 'docker compose -f docker-compose.bdd.yml down -v'
