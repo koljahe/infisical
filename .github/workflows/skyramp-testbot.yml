@@ -42,7 +42,7 @@ jobs:
           skyrampLicenseFile: ${{ secrets.SKYRAMP_LICENSE_FILE }}
           anthropicApiKey: ${{ secrets.SKYRAMP_TESTBOT_API_KEY }}
           githubToken: ${{ steps.skyramp-testbot-app-token.outputs.token }}
-          targetSetupCommand: 'docker compose -f docker-compose.ci.yml up -d --build'
+          targetSetupCommand: 'touch .env && docker compose -f docker-compose.bdd.yml up -d --build'
           targetReadyCheckCommand: 'curl -sf http://localhost:8080/api/status'
-          targetReadyCheckTimeout: '180'
-          targetTeardownCommand: 'docker compose -f docker-compose.ci.yml down -v'
+          targetReadyCheckTimeout: '300'
+          targetTeardownCommand: 'docker compose -f docker-compose.bdd.yml down -v'
