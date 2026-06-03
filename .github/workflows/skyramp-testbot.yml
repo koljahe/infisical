@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   testbot:
-    # Only run for pull_request events or issue_comment on PRs mentioning @skyramp-testbot
     if: >-
       github.event_name == 'pull_request' ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@skyramp-testbot') && github.event.comment.user.login != 'skyramp-testbot[bot]')
@@ -23,8 +22,6 @@ jobs:
       checks: write
 
     steps:
-      # Generate a GitHub App installation token to retrigger CI workflows on push
-      # https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/making-authenticated-api-requests-with-a-github-app-in-a-github-actions-workflow
       - name: Generate GitHub App Token
         id: skyramp-testbot-app-token
         uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
@@ -39,19 +36,7 @@ jobs:
 
       - name: Create .env for SUT
         run: |
-          cat > .env << 'ENVEOF'
-          ENCRYPTION_KEY=4bnfe4gKJ0Lh0PkPHMjpSH+FRJxGpMV1VpMOE1VDgnM=
-          AUTH_SECRET=5lrMXKKWCVocS/uerPsl7V+TX/aaUaI7iDkgl3tSmLE=
-          SITE_URL=http://localhost:8080
-          REDIS_URL=redis://redis:6379
-          DB_CONNECTION_URI=postgres://infisical:infisical@db/infisical?sslmode=disable
-          SMTP_HOST=localhost
-          SMTP_PORT=1025
-          SMTP_FROM_ADDRESS=dev@infisical.local
-          SMTP_FROM_NAME=Infisical
-          TELEMETRY_ENABLED=false
-          ENVEOF
-          sed -i 's/^          //' .env
+          printf '%s\n' 'ENCRYPTION_KEY=4bnfe4gKJ0Lh0PkPHMjpSH+FRJxGpMV1VpMOE1VDgnM=' 'AUTH_SECRET=5lrMXKKWCVocS/uerPsl7V+TX/aaUaI7iDkgl3tSmLE=' 'SITE_URL=http://localhost:8080' 'REDIS_URL=redis://redis:6379' 'DB_CONNECTION_URI=postgres://infisical:infisical@db/infisical?sslmode=disable' 'SMTP_HOST=localhost' 'SMTP_PORT=1025' 'SMTP_FROM_ADDRESS=dev@infisical.local' 'SMTP_FROM_NAME=Infisical' 'TELEMETRY_ENABLED=false' > .env
 
       - uses: skyramp/testbot@7054923f058e1fac3b92925fa475288c733cfea7 # v0.9.4
         with:
