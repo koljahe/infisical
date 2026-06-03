@@ -3735,7 +3735,7 @@ export const registerRoutes = async (
     handler: async () => {
       const cfg = getConfig();
       return {
-        version: cfg.TRACER.version || "unknown",
+        version: cfg.INFISICAL_PLATFORM_VERSION || "unknown",
         buildTimestamp: new Date(process.env.BUILD_TIMESTAMP || Date.now()).toISOString(),
         nodeVersion: process.version
       };
