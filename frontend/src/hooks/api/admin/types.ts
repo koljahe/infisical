@@ -197,6 +197,12 @@ export interface TGetEnvOverrides {
   };
 }
 
+export type TServerVersion = {
+  version: string;
+  buildTimestamp?: string;
+  nodeVersion: string;
+};
+
 export type TUsageReportResponse = {
   filename: string;
   csvContent: string;

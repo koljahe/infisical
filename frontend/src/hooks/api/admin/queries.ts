@@ -15,7 +15,8 @@ import {
   TGetOrganizationsResponse,
   TGetServerRootKmsEncryptionDetails,
   TGetUsersResponse,
-  TServerConfig
+  TServerConfig,
+  TServerVersion
 } from "./types";
 
 export const adminStandaloneKeys = {
@@ -38,7 +39,8 @@ export const adminQueryKeys = {
   getAdminIntegrationsConfig: () => ["admin-integrations-config"] as const,
   getEnvOverrides: () => ["env-overrides"] as const,
   getEmailDomains: (filters: AdminGetEmailDomainsFilters) =>
-    [adminStandaloneKeys.getEmailDomains, { filters }] as const
+    [adminStandaloneKeys.getEmailDomains, { filters }] as const,
+  serverVersion: () => ["server-version"] as const
 };
 
 export const fetchServerConfig = async () => {
@@ -169,6 +171,17 @@ export const useGetEnvOverrides = () => {
       const { data } = await apiRequest.get<TGetEnvOverrides>("/api/v1/admin/env-overrides");
       return data;
     }
+  });
+};
+
+export const useGetServerVersion = () => {
+  return useQuery({
+    queryKey: adminQueryKeys.serverVersion(),
+    queryFn: async () => {
+      const { data } = await apiRequest.get<TServerVersion>("/api/status/version");
+      return data;
+    },
+    staleTime: Infinity
   });
 };
 
