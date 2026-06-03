@@ -3717,6 +3717,31 @@ export const registerRoutes = async (
     }
   });
 
+  server.route({
+    method: "GET",
+    url: "/api/status/version",
+    config: {
+      rateLimit: readLimit
+    },
+    schema: {
+      response: {
+        200: z.object({
+          version: z.string(),
+          buildTimestamp: z.string(),
+          nodeVersion: z.string()
+        })
+      }
+    },
+    handler: async () => {
+      const cfg = getConfig();
+      return {
+        version: cfg.TRACER.version || "unknown",
+        buildTimestamp: new Date(process.env.BUILD_TIMESTAMP || Date.now()).toISOString(),
+        nodeVersion: process.version
+      };
+    }
+  });
+
   // register special routes
   await server.register(registerCertificateEstRouter, { prefix: "/.well-known/est" });
   await server.register(registerPkiScepRouter, { prefix: "/scep" });

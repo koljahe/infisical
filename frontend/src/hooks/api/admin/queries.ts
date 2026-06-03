@@ -15,7 +15,8 @@ import {
   TGetOrganizationsResponse,
   TGetServerRootKmsEncryptionDetails,
   TGetUsersResponse,
-  TServerConfig
+  TServerConfig,
+  TServerVersion
 } from "./types";
 
 export const adminStandaloneKeys = {
@@ -26,6 +27,7 @@ export const adminStandaloneKeys = {
 };
 
 export const adminQueryKeys = {
+  serverVersion: () => ["server-version"] as const,
   serverConfig: () => ["server-config"] as const,
   getUsers: (filters: AdminGetUsersFilters) => [adminStandaloneKeys.getUsers, { filters }] as const,
   getOrganizations: (filters?: AdminGetOrganizationsFilters) =>
@@ -45,6 +47,16 @@ export const fetchServerConfig = async () => {
   const { data } = await apiRequest.get<{ config: TServerConfig }>("/api/v1/admin/config");
   return data.config;
 };
+
+export const useGetServerVersion = () =>
+  useQuery({
+    queryKey: adminQueryKeys.serverVersion(),
+    queryFn: async () => {
+      const { data } = await apiRequest.get<TServerVersion>("/api/status/version");
+      return data;
+    },
+    staleTime: Infinity
+  });
 
 export const useAdminGetOrganizations = (filters: AdminGetOrganizationsFilters) => {
   return useQuery({
