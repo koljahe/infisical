@@ -1,0 +1,14 @@
+{
+  "name": "@infisical/version-endpoint-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:contract": "node contract.test.mjs",
+    "test:integration": "node integration.test.mjs",
+    "test:ui": "npx playwright test ui.spec.mjs --project=chromium",
+    "test:all": "node contract.test.mjs && node integration.test.mjs && npx playwright test ui.spec.mjs --project=chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1"
+  }
+}
