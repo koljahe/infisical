@@ -35,6 +35,12 @@ export type OrganizationWithProjects = Organization & {
   }[];
 };
 
+export type TServerVersion = {
+  version: string;
+  buildTimestamp: string;
+  nodeVersion: string;
+};
+
 export type TGetOrganizationsResponse = {
   organizations: OrganizationWithProjects[];
   total: number;

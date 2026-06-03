@@ -1,0 +1,15 @@
+{
+  "name": "infisical-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:contract": "vitest run contract/",
+    "test:integration": "vitest run integration/",
+    "test:ui": "playwright test",
+    "test": "vitest run && playwright test"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.3",
+    "@playwright/test": "^1.52.0"
+  }
+}
