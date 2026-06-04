@@ -39,6 +39,7 @@ export const formSchema = z.object({
     ),
   overrideAction: z.string().trim().optional(),
   comment: z.string().trim().optional(),
+  description: z.string().max(500, "Description cannot exceed 500 characters").trim().optional(),
   skipMultilineEncoding: z.boolean().nullish(),
   reminderRepeatDays: z
     .number()

@@ -135,6 +135,7 @@ export const useGetImportedSecretsSingleEnv = ({
             secretValueHidden: encSecret.secretValueHidden,
             tags: encSecret.tags,
             comment: encSecret.secretComment,
+            description: encSecret.secretDescription || "",
             createdAt: encSecret.createdAt,
             updatedAt: encSecret.updatedAt,
             version: encSecret.version,

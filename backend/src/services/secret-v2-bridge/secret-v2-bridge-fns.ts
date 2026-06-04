@@ -52,6 +52,7 @@ export const fnSecretBulkInsert = async ({
       key,
       userId,
       encryptedComment,
+      encryptedDescription,
       version,
       reminderNote,
       encryptedValue,
@@ -63,6 +64,7 @@ export const fnSecretBulkInsert = async ({
       key,
       userId,
       encryptedComment,
+      encryptedDescription,
       version,
       reminderNote,
       encryptedValue,
@@ -215,7 +217,7 @@ export const fnSecretBulkUpdate = async ({
   const sanitizedInputSecrets = inputSecrets.map(
     ({
       filter,
-      data: { skipMultilineEncoding, type, key, encryptedValue, userId, encryptedComment, secretValueBlindIndex }
+      data: { skipMultilineEncoding, type, key, encryptedValue, userId, encryptedComment, encryptedDescription, secretValueBlindIndex }
     }) => ({
       filter: { ...filter, folderId },
       data: {
@@ -224,6 +226,7 @@ export const fnSecretBulkUpdate = async ({
         key,
         userId,
         encryptedComment,
+        encryptedDescription,
         encryptedValue,
         secretValueBlindIndex
       }
@@ -240,6 +243,7 @@ export const fnSecretBulkUpdate = async ({
         key,
         userId,
         encryptedComment,
+        encryptedDescription,
         version,
         encryptedValue,
         secretValueBlindIndex,
@@ -252,6 +256,7 @@ export const fnSecretBulkUpdate = async ({
       key,
       userId,
       encryptedComment,
+      encryptedDescription,
       version,
       metadata:
         JSON.stringify(
@@ -574,9 +579,10 @@ export const reshapeBridgeSecret = (
   projectId: string,
   environment: string,
   secretPath: string,
-  secret: Omit<TSecretsV2, "encryptedValue" | "encryptedComment"> & {
+  secret: Omit<TSecretsV2, "encryptedValue" | "encryptedComment" | "encryptedDescription"> & {
     value: string;
     comment: string;
+    description: string;
     userActorName?: string | null;
     identityActorName?: string | null;
     userActorId?: string | null;
@@ -604,6 +610,7 @@ export const reshapeBridgeSecret = (
   projectId,
   environment,
   secretComment: secret.comment || "",
+  secretDescription: secret.description || "",
   version: secret.version,
   type: secret.type,
   _id: secret.id,

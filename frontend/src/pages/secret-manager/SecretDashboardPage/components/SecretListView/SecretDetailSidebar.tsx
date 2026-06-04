@@ -493,6 +493,27 @@ export const SecretDetailSidebar = ({
                 />
               )}
             </ProjectPermissionCan>
+            <Controller
+              control={control}
+              name="description"
+              render={({ field, fieldState: { error } }) => (
+                <FormControl
+                  label="Description"
+                  isError={Boolean(error?.message)}
+                  errorText={error?.message}
+                  className="mb-0"
+                >
+                  <TextArea
+                    className="mb-0 resize-none! border border-mineshaft-600 bg-mineshaft-900 text-sm"
+                    readOnly={isReadOnly}
+                    placeholder="describe what this secret is for..."
+                    rows={3}
+                    maxLength={500}
+                    {...field}
+                  />
+                </FormControl>
+              )}
+            />
             <div className="rounded-md border border-mineshaft-600 bg-mineshaft-900 p-4">
               <Controller
                 control={control}
