@@ -1800,6 +1800,9 @@ export const secretRotationV2ServiceFactory = ({
                 : "",
               comment: secret.encryptedComment
                 ? secretManagerDecryptor({ cipherTextBlob: secret.encryptedComment }).toString()
+                : "",
+              description: secret.encryptedDescription
+                ? secretManagerDecryptor({ cipherTextBlob: secret.encryptedDescription }).toString()
                 : ""
             },
             secretValueHidden && secret.type === SecretType.Shared

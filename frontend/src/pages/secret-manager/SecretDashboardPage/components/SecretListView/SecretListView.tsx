@@ -115,6 +115,7 @@ export const SecretListView = ({
       secretValueHidden,
       value,
       comment,
+      description,
       reminderRepeatDays,
       reminderNote,
       reminderRecipients,
@@ -129,6 +130,7 @@ export const SecretListView = ({
       secretValueHidden: boolean;
       value: string;
       comment: string;
+      description: string;
       reminderRepeatDays: number | null;
       reminderNote: string | null;
       reminderRecipients?: string[] | null;
@@ -175,6 +177,7 @@ export const SecretListView = ({
         type,
         tagIds: tags,
         secretComment: comment,
+        secretDescription: description,
         secretReminderRepeatDays: reminderRepeatDays,
         secretReminderNote: reminderNote,
         secretReminderRecipients: reminderRecipients,
@@ -262,6 +265,7 @@ export const SecretListView = ({
         valueOverride,
         tags,
         comment,
+        description,
         reminderRepeatDays,
         reminderNote,
         reminderRecipients,
@@ -287,6 +291,7 @@ export const SecretListView = ({
             "key",
             "value",
             "comment",
+            "description",
             "skipMultilineEncoding",
             "reminderRepeatDays",
             "reminderNote",
@@ -389,6 +394,7 @@ export const SecretListView = ({
           value,
           tags: tagIds,
           comment,
+          description,
           reminderRepeatDays,
           reminderNote,
           reminderRecipients,

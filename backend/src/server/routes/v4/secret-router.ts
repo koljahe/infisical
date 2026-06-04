@@ -445,6 +445,7 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
           .transform((val) => (val.at(-1) === "\n" ? `${val.trim()}\n` : val.trim()))
           .describe(RAW_SECRETS.CREATE.secretValue),
         secretComment: z.string().trim().optional().default("").describe(RAW_SECRETS.CREATE.secretComment),
+        secretDescription: z.string().max(500, "Secret description cannot exceed 500 characters").trim().optional(),
         secretMetadata: ResourceMetadataWithEncryptionSchema.optional(),
         tagIds: z.string().array().optional().describe(RAW_SECRETS.CREATE.tagIds),
         skipMultilineEncoding: z.boolean().nullish().describe(RAW_SECRETS.CREATE.skipMultilineEncoding),
@@ -485,6 +486,7 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
         secretValue: req.body.secretValue,
         skipMultilineEncoding: req.body.skipMultilineEncoding,
         secretComment: req.body.secretComment,
+        secretDescription: req.body.secretDescription,
         secretMetadata: req.body.secretMetadata,
         tagIds: req.body.tagIds,
         secretReminderNote: req.body.secretReminderNote,
@@ -621,7 +623,8 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
           .describe(RAW_SECRETS.UPDATE.secretReminderRepeatDays),
         secretReminderRecipients: z.string().array().optional().describe(RAW_SECRETS.UPDATE.secretReminderRecipients),
         newSecretName: SecretNameSchema.optional().describe(RAW_SECRETS.UPDATE.newSecretName),
-        secretComment: z.string().optional().describe(RAW_SECRETS.UPDATE.secretComment)
+        secretComment: z.string().optional().describe(RAW_SECRETS.UPDATE.secretComment),
+        secretDescription: z.string().max(500, "Secret description cannot exceed 500 characters").trim().optional()
       }),
       response: {
         200: z.union([
@@ -655,6 +658,7 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
         metadata: req.body.metadata,
         newSecretName: req.body.newSecretName,
         secretComment: req.body.secretComment,
+        secretDescription: req.body.secretDescription,
         secretMetadata: req.body.secretMetadata
       });
 

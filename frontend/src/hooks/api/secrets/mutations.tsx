@@ -106,6 +106,7 @@ export const useUpdateSecretV3 = ({
       secretValue,
       tagIds,
       secretComment,
+      secretDescription,
       secretReminderRepeatDays,
       secretReminderNote,
       secretReminderRecipients,
@@ -124,6 +125,7 @@ export const useUpdateSecretV3 = ({
         skipMultilineEncoding,
         newSecretName,
         secretComment,
+        secretDescription,
         tagIds,
         secretValue,
         secretMetadata

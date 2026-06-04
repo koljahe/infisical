@@ -26,6 +26,7 @@ export type SecretV3RawSanitized = {
   value?: string;
   secretValueHidden: boolean;
   comment?: string;
+  description?: string;
   reminderRepeatDays?: number | null;
   reminderNote?: string | null;
   reminderRecipients?: string[];
@@ -65,6 +66,7 @@ export type SecretV3Raw = {
   secretPath: string;
   secretValue?: string;
   secretComment?: string;
+  secretDescription?: string;
   secretReminderNote?: string;
   secretReminderRepeatDays?: number;
   secretMetadata?: { key: string; value: string; isEncrypted?: boolean }[];
@@ -192,6 +194,7 @@ export type TUpdateSecretsV3DTO = {
   secretKey: string;
   secretValue?: string;
   secretComment?: string;
+  secretDescription?: string;
   secretReminderRepeatDays?: number | null;
   secretReminderNote?: string | null;
   tagIds?: string[];
