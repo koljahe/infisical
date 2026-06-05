@@ -5,6 +5,8 @@ import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import {
   faCheckCircle,
   faCopy,
+  faLock,
+  faLockOpen,
   faPlus,
   faProjectDiagram,
   faSearch,
@@ -54,7 +56,7 @@ import {
 import { ProjectPermissionSecretActions } from "@app/context/ProjectPermissionContext/types";
 import { getProjectBaseURL } from "@app/helpers/project";
 import { usePopUp, useToggle } from "@app/hooks";
-import { useGetSecretVersion, useRedactSecretValue } from "@app/hooks/api";
+import { useGetSecretVersion, useRedactSecretValue, useToggleSecretLock } from "@app/hooks/api";
 import {
   dashboardKeys,
   fetchSecretValue,
@@ -135,7 +137,9 @@ export const SecretDetailSidebar = ({
     valueOverride: originalSecret?.valueOverride ?? secretValueData?.valueOverride
   };
 
-  const { permission } = useProjectPermission();
+  const { permission, hasProjectRole } = useProjectPermission();
+  const isAdmin = hasProjectRole("admin");
+  const { mutateAsync: toggleSecretLock } = useToggleSecretLock();
 
   const canEditSecretValue = permission.can(
     ProjectPermissionSecretActions.Edit,
@@ -261,8 +265,11 @@ export const SecretDetailSidebar = ({
     }
   );
 
+  const isSecretLocked = Boolean(secret.isLocked);
+
   const isReadOnly =
-    hasSecretReadValueOrDescribePermission(
+    isSecretLocked ||
+    (hasSecretReadValueOrDescribePermission(
       permission,
       ProjectPermissionSecretActions.DescribeSecret,
       {
@@ -272,8 +279,8 @@ export const SecretDetailSidebar = ({
         secretTags: selectTagSlugs
       }
     ) &&
-    cannotEditSecret &&
-    cannotReadSecretValue;
+      cannotEditSecret &&
+      cannotReadSecretValue);
 
   const overrideAction = watch("overrideAction");
   const isOverridden =
@@ -941,6 +948,36 @@ export const SecretDetailSidebar = ({
                   <FontAwesomeIcon icon={faCopy} />
                 </IconButton>
               </Tooltip>
+              {isAdmin && (
+                <Tooltip
+                  content={secret.isLocked ? "Unlock Secret" : "Lock Secret"}
+                  className="z-100"
+                >
+                  <IconButton
+                    variant="outline_bg"
+                    ariaLabel={secret.isLocked ? "Unlock Secret" : "Lock Secret"}
+                    className="h-min border border-mineshaft-600 bg-mineshaft-700"
+                    onClick={async () => {
+                      await toggleSecretLock({
+                        secretId: secret.id,
+                        isLocked: !secret.isLocked,
+                        projectId: currentProject.id,
+                        environment,
+                        secretPath
+                      });
+                      createNotification({
+                        title: secret.isLocked ? "Secret Unlocked" : "Secret Locked",
+                        text: secret.isLocked
+                          ? "The secret has been unlocked and can now be edited."
+                          : "The secret has been locked and cannot be edited or deleted.",
+                        type: "success"
+                      });
+                    }}
+                  >
+                    <FontAwesomeIcon icon={secret.isLocked ? faLockOpen : faLock} />
+                  </IconButton>
+                </Tooltip>
+              )}
               <ProjectPermissionCan
                 I={ProjectPermissionActions.Delete}
                 a={subject(ProjectPermissionSub.Secrets, {
@@ -951,13 +988,13 @@ export const SecretDetailSidebar = ({
                 })}
               >
                 {(isAllowed) => (
-                  <Tooltip content="Delete Secret" align="end" className="z-100">
+                  <Tooltip content={secret.isLocked ? "Secret is locked" : "Delete Secret"} align="end" className="z-100">
                     <IconButton
                       colorSchema="danger"
                       variant="outline_bg"
                       ariaLabel="Delete Secret"
                       className="h-min border border-mineshaft-600 bg-mineshaft-700 hover:border-red-500/70 hover:bg-red-600/20"
-                      isDisabled={!isAllowed}
+                      isDisabled={!isAllowed || secret.isLocked}
                       onClick={onDeleteSecret}
                     >
                       <FontAwesomeIcon icon={faTrash} />

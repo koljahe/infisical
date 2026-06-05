@@ -7,6 +7,7 @@ export {
   useDuplicateSecret,
   useMoveSecrets,
   useRedactSecretValue,
+  useToggleSecretLock,
   useUpdateSecretBatch,
   useUpdateSecretV3
 } from "./mutations";

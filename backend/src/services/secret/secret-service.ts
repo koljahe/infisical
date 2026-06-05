@@ -99,6 +99,7 @@ import {
   TMoveSecretsDTO,
   TRedactSecretVersionValueDTO,
   TStartSecretsV2MigrationDTO,
+  TToggleSecretLockDTO,
   TUpdateBulkSecretDTO,
   TUpdateManySecretRawDTO,
   TUpdateSecretDTO,
@@ -141,7 +142,7 @@ type TSecretServiceFactoryDep = {
   licenseService: Pick<TLicenseServiceFactory, "getPlan">;
   reminderService: Pick<TReminderServiceFactory, "createReminder">;
   secretVersionV2DAL: Pick<TSecretVersionV2DALFactory, "findOne">;
-  secretV2BridgeDAL: Pick<TSecretV2BridgeDALFactory, "invalidateSecretCacheByProjectId" | "find">;
+  secretV2BridgeDAL: Pick<TSecretV2BridgeDALFactory, "invalidateSecretCacheByProjectId" | "find" | "updateById">;
   kmsService: Pick<TKmsServiceFactory, "createCipherPairWithDataKey">;
   userGroupMembershipDAL: Pick<TUserGroupMembershipDALFactory, "find">;
   identityGroupMembershipDAL: Pick<TIdentityGroupMembershipDALFactory, "find">;
@@ -3814,6 +3815,37 @@ export const secretServiceFactory = ({
     return secretV2BridgeService.redactSecretVersionValue({ versionId, ...rest });
   };
 
+  const toggleSecretLock = async ({
+    secretId,
+    isLocked,
+    projectId,
+    environment,
+    secretPath,
+    actor,
+    actorId,
+    actorAuthMethod,
+    actorOrgId
+  }: TToggleSecretLockDTO) => {
+    const { hasRole } = await permissionService.getProjectPermission({
+      actor,
+      actorId,
+      projectId,
+      actorAuthMethod,
+      actorOrgId,
+      actionProjectType: ActionProjectType.SecretManager
+    });
+
+    if (!hasRole(ProjectMembershipRole.Admin)) {
+      throw new ForbiddenRequestError({
+        message: "Only project admins can lock or unlock secrets."
+      });
+    }
+
+    const updatedSecret = await secretV2BridgeDAL.updateById(secretId, { isLocked });
+
+    return { id: updatedSecret.id, isLocked: updatedSecret.isLocked };
+  };
+
   return {
     attachTags,
     detachTags,
@@ -3849,6 +3881,7 @@ export const secretServiceFactory = ({
     getSecretVersionsV2ByIds,
     getChangeVersions,
     redactSecretVersionValue,
-    getSecretReferenceDependencyTree
+    getSecretReferenceDependencyTree,
+    toggleSecretLock
   };
 };

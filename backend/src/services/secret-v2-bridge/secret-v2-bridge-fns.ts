@@ -593,6 +593,7 @@ export const reshapeBridgeSecret = (
     secretMetadata?: ResourceMetadataWithEncryptionDTO;
     isRotatedSecret?: boolean;
     isHoneyTokenSecret?: boolean;
+    isLocked?: boolean;
     rotationId?: string;
     secretReminderRecipients?: TSecretReminderRecipient[];
   },
@@ -628,6 +629,7 @@ export const reshapeBridgeSecret = (
   updatedAt: secret.updatedAt,
   isRotatedSecret: secret.isRotatedSecret,
   isHoneyTokenSecret: secret.isHoneyTokenSecret,
+  isLocked: secret.isLocked,
   rotationId: secret.rotationId,
   secretReminderRecipients: secret.secretReminderRecipients || [],
   ...(secretValueHidden

@@ -43,6 +43,7 @@ export type SecretV3RawSanitized = {
   isReminderEvent?: boolean;
   isRotatedSecret?: boolean;
   isHoneyTokenSecret?: boolean;
+  isLocked?: boolean;
   secretReminderRecipients?: SecretReminderRecipient[];
   rotationId?: string;
   isPending?: boolean;
@@ -75,6 +76,7 @@ export type SecretV3Raw = {
   updatedAt: string;
   isRotatedSecret?: boolean;
   isHoneyTokenSecret?: boolean;
+  isLocked?: boolean;
   rotationId?: string;
   secretReminderRecipients?: SecretReminderRecipient[];
   reminder?: Reminder;
@@ -344,4 +346,12 @@ export type SecretAccessListEntry = {
 export type SecretAccessListGroupEntry = SecretAccessListEntry & {
   userIds: string[];
   identityIds: string[];
+};
+
+export type TToggleSecretLockDTO = {
+  secretId: string;
+  isLocked: boolean;
+  projectId: string;
+  environment: string;
+  secretPath: string;
 };
