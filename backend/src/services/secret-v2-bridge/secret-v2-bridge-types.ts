@@ -272,6 +272,23 @@ export type TRemoveSecretReminderDTO = {
   projectId: string;
 };
 
+export type TArchiveSecretDTO = TProjectPermission & {
+  secretId: string;
+};
+
+export type TRestoreSecretDTO = TProjectPermission & {
+  secretId: string;
+};
+
+export type TListArchivedSecretsDTO = TProjectPermission & {
+  environment: string;
+  secretPath: string;
+};
+
+export type TDeleteArchivedSecretDTO = TProjectPermission & {
+  secretId: string;
+};
+
 export type TBackFillSecretReferencesDTO = TProjectPermission;
 
 export type TCreateManySecretsFnFactory = {

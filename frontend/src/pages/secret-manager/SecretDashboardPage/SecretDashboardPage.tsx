@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import { subject } from "@casl/ability";
@@ -72,6 +73,7 @@ import { SecretRotationListView } from "@app/pages/secret-manager/SecretDashboar
 import { SecretTableResourceCount } from "../OverviewPage/components/SecretTableResourceCount";
 import { SecretV2MigrationSection } from "../OverviewPage/components/SecretV2MigrationSection";
 import { ActionBar } from "./components/ActionBar";
+import { ArchivedSecretsView } from "./components/ArchivedSecretsView";
 import { CommitForm } from "./components/CommitForm";
 import { CreateSecretForm } from "./components/CreateSecretForm";
 import { DynamicSecretListView } from "./components/DynamicSecretListView";
@@ -122,6 +124,7 @@ const Page = () => {
   const tableRef = useRef<HTMLTableElement>(null);
 
   const [isVisible, setIsVisible] = useState(false);
+  const [showTrash, setShowTrash] = useState(false);
   const [selectedDynamicSecretId, setSelectedDynamicSecretId] = useState<string | null>(
     routerQueryParams.dynamicSecretId || ""
   );
@@ -906,8 +909,28 @@ const Page = () => {
       />
       <SecretV2MigrationSection />
       <FolderBreadCrumbs secretPath={secretPath} />
-      <EnvironmentTabs secretPath={secretPath} />
-      {!isRollbackMode ? (
+      <div className="flex items-center justify-between">
+        <EnvironmentTabs secretPath={secretPath} />
+        <Button
+          variant="outline_bg"
+          size="xs"
+          className={twMerge("ml-2", showTrash && "border-primary-500 text-primary-400")}
+          leftIcon={<FontAwesomeIcon icon={faTrashCan} />}
+          onClick={() => setShowTrash((prev) => !prev)}
+        >
+          Trash
+        </Button>
+      </div>
+      {showTrash ? (
+        <div className="mt-3 rounded-md bg-mineshaft-800 p-4">
+          <h3 className="mb-3 text-sm font-medium text-mineshaft-200">Archived Secrets</h3>
+          <ArchivedSecretsView
+            projectId={projectId}
+            environment={environment}
+            secretPath={secretPath}
+          />
+        </div>
+      ) : !isRollbackMode ? (
         <>
           <ActionBar
             environment={environment}
@@ -1216,7 +1239,7 @@ const Page = () => {
           onGoBack={handleResetSnapshot}
           onClickListSnapshot={() => handlePopUpToggle("snapshots", true)}
         />
-      )}
+      ))}
     </div>
   );
 };

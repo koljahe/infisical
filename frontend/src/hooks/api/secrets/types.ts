@@ -345,3 +345,34 @@ export type SecretAccessListGroupEntry = SecretAccessListEntry & {
   userIds: string[];
   identityIds: string[];
 };
+
+export type ArchivedSecret = {
+  id: string;
+  key: string;
+  version: number;
+  type: string;
+  archivedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TArchiveSecretDTO = {
+  secretId: string;
+  projectId: string;
+};
+
+export type TRestoreSecretDTO = {
+  secretId: string;
+  projectId: string;
+};
+
+export type TDeleteArchivedSecretDTO = {
+  secretId: string;
+  projectId: string;
+};
+
+export type TListArchivedSecretsDTO = {
+  projectId: string;
+  environment: string;
+  secretPath: string;
+};

@@ -13,13 +13,16 @@ import { PendingAction } from "../secretFolders/types";
 import { secretSnapshotKeys } from "../secretSnapshots/queries";
 import { secretKeys } from "./queries";
 import {
+  TArchiveSecretDTO,
   TCreateSecretBatchDTO,
   TCreateSecretsV3DTO,
+  TDeleteArchivedSecretDTO,
   TDeleteSecretBatchDTO,
   TDeleteSecretsV3DTO,
   TDuplicateSecretDTO,
   TDuplicateSecretResponse,
   TMoveSecretsDTO,
+  TRestoreSecretDTO,
   TUpdateSecretBatchDTO,
   TUpdateSecretsV3DTO
 } from "./types";
@@ -696,6 +699,69 @@ export const useRedactSecretValue = () => {
     },
     onSuccess: (_, { secretId }) => {
       queryClient.invalidateQueries({ queryKey: secretKeys.getSecretVersion(secretId) });
+    }
+  });
+};
+
+export const useArchiveSecret = () => {
+  const queryClient = useQueryClient();
+  return useMutation<object, object, TArchiveSecretDTO & { environment: string; secretPath: string }>({
+    mutationFn: async ({ secretId, projectId }) => {
+      const { data } = await apiRequest.post(`/api/v1/secrets/${secretId}/archive`, {
+        projectId
+      });
+      return data;
+    },
+    onSuccess: (_, { projectId, environment, secretPath }) => {
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.getDashboardSecrets({ projectId, secretPath })
+      });
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getProjectSecret({ projectId, environment, secretPath })
+      });
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getArchivedSecrets({ projectId, environment, secretPath })
+      });
+    }
+  });
+};
+
+export const useRestoreSecret = () => {
+  const queryClient = useQueryClient();
+  return useMutation<object, object, TRestoreSecretDTO & { environment: string; secretPath: string }>({
+    mutationFn: async ({ secretId, projectId }) => {
+      const { data } = await apiRequest.post(`/api/v1/secrets/${secretId}/restore`, {
+        projectId
+      });
+      return data;
+    },
+    onSuccess: (_, { projectId, environment, secretPath }) => {
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.getDashboardSecrets({ projectId, secretPath })
+      });
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getProjectSecret({ projectId, environment, secretPath })
+      });
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getArchivedSecrets({ projectId, environment, secretPath })
+      });
+    }
+  });
+};
+
+export const useDeleteArchivedSecret = () => {
+  const queryClient = useQueryClient();
+  return useMutation<object, object, TDeleteArchivedSecretDTO & { environment: string; secretPath: string }>({
+    mutationFn: async ({ secretId, projectId }) => {
+      const { data } = await apiRequest.delete(`/api/v1/secrets/${secretId}/permanent`, {
+        data: { projectId }
+      });
+      return data;
+    },
+    onSuccess: (_, { projectId, environment, secretPath }) => {
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getArchivedSecrets({ projectId, environment, secretPath })
+      });
     }
   });
 };

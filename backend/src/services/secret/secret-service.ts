@@ -3814,6 +3814,22 @@ export const secretServiceFactory = ({
     return secretV2BridgeService.redactSecretVersionValue({ versionId, ...rest });
   };
 
+  const archiveSecret = async (dto: Parameters<typeof secretV2BridgeService.archiveSecret>[0]) => {
+    return secretV2BridgeService.archiveSecret(dto);
+  };
+
+  const restoreSecret = async (dto: Parameters<typeof secretV2BridgeService.restoreSecret>[0]) => {
+    return secretV2BridgeService.restoreSecret(dto);
+  };
+
+  const listArchivedSecrets = async (dto: Parameters<typeof secretV2BridgeService.listArchivedSecrets>[0]) => {
+    return secretV2BridgeService.listArchivedSecrets(dto);
+  };
+
+  const deleteArchivedSecret = async (dto: Parameters<typeof secretV2BridgeService.deleteArchivedSecret>[0]) => {
+    return secretV2BridgeService.deleteArchivedSecret(dto);
+  };
+
   return {
     attachTags,
     detachTags,
@@ -3849,6 +3865,10 @@ export const secretServiceFactory = ({
     getSecretVersionsV2ByIds,
     getChangeVersions,
     redactSecretVersionValue,
-    getSecretReferenceDependencyTree
+    getSecretReferenceDependencyTree,
+    archiveSecret,
+    restoreSecret,
+    listArchivedSecrets,
+    deleteArchivedSecret
   };
 };
