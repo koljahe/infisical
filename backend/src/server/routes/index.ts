@@ -461,6 +461,8 @@ import { secretSharingServiceFactory } from "@app/services/secret-sharing/secret
 import { secretSyncDALFactory } from "@app/services/secret-sync/secret-sync-dal";
 import { secretSyncQueueFactory } from "@app/services/secret-sync/secret-sync-queue";
 import { secretSyncServiceFactory } from "@app/services/secret-sync/secret-sync-service";
+import { secretFavoriteDALFactory } from "@app/services/secret-favorite/secret-favorite-dal";
+import { secretFavoriteServiceFactory } from "@app/services/secret-favorite/secret-favorite-service";
 import { secretTagDALFactory } from "@app/services/secret-tag/secret-tag-dal";
 import { secretTagServiceFactory } from "@app/services/secret-tag/secret-tag-service";
 import { secretV2BridgeDALFactory } from "@app/services/secret-v2-bridge/secret-v2-bridge-dal";
@@ -568,6 +570,7 @@ export const registerRoutes = async (
   const projectBotDAL = projectBotDALFactory(db);
 
   const secretDAL = secretDALFactory(db);
+  const secretFavoriteDAL = secretFavoriteDALFactory(db);
   const secretTagDAL = secretTagDALFactory(db);
   const secretValidationRuleDAL = secretValidationRuleDALFactory(db);
   const folderDAL = secretFolderDALFactory(db);
@@ -1774,6 +1777,11 @@ export const registerRoutes = async (
   });
 
   const secretTagService = secretTagServiceFactory({ secretTagDAL, permissionService, secretV2BridgeDAL });
+  const secretFavoriteService = secretFavoriteServiceFactory({
+    secretFavoriteDAL,
+    secretDAL: secretV2BridgeDAL,
+    permissionService
+  });
   const secretValidationRuleService = secretValidationRuleServiceFactory({
     secretValidationRuleDAL,
     projectEnvDAL,
@@ -3461,6 +3469,7 @@ export const registerRoutes = async (
     secret: secretService,
     secretReplication: secretReplicationService,
     secretTag: secretTagService,
+    secretFavorite: secretFavoriteService,
     secretValidationRule: secretValidationRuleService,
     rateLimit: rateLimitService,
     folder: folderService,

@@ -518,6 +518,9 @@ import {
   TSecretBlindIndexes,
   TSecretBlindIndexesInsert,
   TSecretBlindIndexesUpdate,
+  TSecretFavorites,
+  TSecretFavoritesInsert,
+  TSecretFavoritesUpdate,
   TSecretFolders,
   TSecretFoldersInsert,
   TSecretFoldersUpdate,
@@ -1148,6 +1151,11 @@ declare module "knex/types/tables" {
     >;
     [TableName.RateLimit]: KnexOriginal.CompositeTableType<TRateLimit, TRateLimitInsert, TRateLimitUpdate>;
     [TableName.SecretTag]: KnexOriginal.CompositeTableType<TSecretTags, TSecretTagsInsert, TSecretTagsUpdate>;
+    [TableName.SecretFavorite]: KnexOriginal.CompositeTableType<
+      TSecretFavorites,
+      TSecretFavoritesInsert,
+      TSecretFavoritesUpdate
+    >;
     [TableName.SecretImport]: KnexOriginal.CompositeTableType<
       TSecretImports,
       TSecretImportsInsert,
