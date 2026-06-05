@@ -72,6 +72,7 @@ import { registerPkiApplicationRouter } from "./pki-application-router";
 import { registerPkiCollectionRouter } from "./pki-collection-router";
 import { registerPkiSubscriberRouter } from "./pki-subscriber-router";
 import { PKI_SYNC_REGISTER_ROUTER_MAP, registerPkiSyncRouter } from "./pki-sync-routers";
+import { registerProjectActivitySummaryRouter } from "./project-activity-summary-router";
 import { registerProjectEnvRouter } from "./project-env-router";
 import { registerProjectGroupMembershipsRouter } from "./project-group-memberships-router";
 import { registerProjectIdentityRouter } from "./project-identity-router";
@@ -167,6 +168,7 @@ export const registerV1Routes = async (server: FastifyZodProvider) => {
       await projectRouter.register(registerSecretValidationRuleRouter);
       await projectRouter.register(registerGroupProjectRouter);
       await projectRouter.register(registerDeprecatedIdentityProjectMembershipRouter);
+      await projectRouter.register(registerProjectActivitySummaryRouter);
     },
     { prefix: "/projects" }
   );

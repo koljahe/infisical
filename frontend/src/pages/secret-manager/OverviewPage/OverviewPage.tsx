@@ -205,6 +205,7 @@ import {
   useBatchMode,
   useBatchModeActions
 } from "../SecretDashboardPage/SecretMainPage.store";
+import { ActivitySummaryCard } from "./components/ActivitySummaryCard";
 import { AddResourceButtons } from "./components/AddResourceButtons/AddResourceButtons";
 import { CreateSecretForm } from "./components/CreateSecretForm";
 import { ImportSecretsModal, SecretDropzone } from "./components/SecretDropzone";
@@ -2491,6 +2492,8 @@ const OverviewPageContent = () => {
             }
           />
         </div>
+
+        <ActivitySummaryCard projectId={projectId} />
 
         <SelectionPanel
           secretPath={secretPath}
