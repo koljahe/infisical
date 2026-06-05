@@ -18,6 +18,8 @@ import {
   SecretV3RawResponse,
   SecretV3RawSanitized,
   SecretVersions,
+  TExpiringSecret,
+  TGetExpiringSecretsDTO,
   TGetProjectSecretsAllEnvDTO,
   TGetProjectSecretsDTO,
   TGetProjectSecretsKey,
@@ -54,7 +56,8 @@ export const secretKeys = {
       { projectId, environment, secretPath, secretKey, includeAllEntities }
     ] as const,
   getSecretReferenceTree: (dto: TGetSecretReferenceTreeDTO) => ["secret-reference-tree", dto],
-  getSecretReferences: (dto: TGetSecretReferencesDTO) => ["secret-references", dto]
+  getSecretReferences: (dto: TGetSecretReferencesDTO) => ["secret-references", dto],
+  getExpiringSecrets: (projectId: string) => [{ projectId }, "expiring-secrets"] as const
 };
 
 export const fetchProjectSecrets = async ({
@@ -378,4 +381,21 @@ export const useGetSecretReferences = (
       Boolean(dto.secretKey),
     queryKey: secretKeys.getSecretReferences(dto),
     queryFn: () => fetchSecretReferences(dto)
+  });
+
+const fetchExpiringSecrets = async ({ projectId }: TGetExpiringSecretsDTO) => {
+  const { data } = await apiRequest.get<{ secrets: TExpiringSecret[] }>(
+    `/api/v1/projects/${projectId}/secrets/expiring`
+  );
+  return data.secrets;
+};
+
+export const useGetExpiringSecrets = (
+  dto: TGetExpiringSecretsDTO,
+  options?: { enabled?: boolean }
+) =>
+  useQuery({
+    enabled: (options?.enabled ?? true) && Boolean(dto.projectId),
+    queryKey: secretKeys.getExpiringSecrets(dto.projectId),
+    queryFn: () => fetchExpiringSecrets(dto)
   });

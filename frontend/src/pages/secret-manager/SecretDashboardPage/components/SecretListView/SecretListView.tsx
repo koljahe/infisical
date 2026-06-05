@@ -124,7 +124,8 @@ export const SecretListView = ({
       secretId,
       secretMetadata,
       isRotatedSecret,
-      isHoneyTokenSecret
+      isHoneyTokenSecret,
+      expiresAt
     }: Partial<{
       secretValueHidden: boolean;
       value: string;
@@ -139,6 +140,7 @@ export const SecretListView = ({
       secretMetadata?: { key: string; value: string }[];
       isRotatedSecret?: boolean;
       isHoneyTokenSecret?: boolean;
+      expiresAt?: string | null;
     }> = {}
   ) => {
     if (operation === "delete") {
@@ -179,7 +181,8 @@ export const SecretListView = ({
         secretReminderNote: reminderNote,
         secretReminderRecipients: reminderRecipients,
         skipMultilineEncoding,
-        secretMetadata
+        secretMetadata,
+        expiresAt
       });
       return;
     }
@@ -268,7 +271,8 @@ export const SecretListView = ({
         secretMetadata,
         isReminderEvent,
         isPending,
-        pendingAction
+        pendingAction,
+        expiresAt
       } = modSecret;
       const hasKeyChanged = oldKey !== key && key;
 
@@ -398,7 +402,8 @@ export const SecretListView = ({
           secretMetadata,
           isRotatedSecret: orgSecret.isRotatedSecret,
           isHoneyTokenSecret: orgSecret.isHoneyTokenSecret,
-          secretValueHidden
+          secretValueHidden,
+          expiresAt
         });
         if (cb) cb();
       }

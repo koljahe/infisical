@@ -49,6 +49,7 @@ import {
   recordSecretReadMetric,
   SecretCacheAccessResult
 } from "@app/lib/telemetry/metrics";
+import { TProjectPermission } from "@app/lib/types";
 
 import { ActorType } from "../auth/auth-type";
 import { TCommitResourceChangeDTO, TFolderCommitServiceFactory } from "../folder-commit/folder-commit-service";
@@ -409,6 +410,7 @@ export const secretV2BridgeServiceFactory = ({
             userId: inputSecret.type === SecretType.Personal ? actorId : null,
             tagIds: inputSecret.tagIds,
             references: nestedReferences,
+            expiresAt: inputSecretData.expiresAt ? new Date(inputSecretData.expiresAt) : null,
             secretMetadata: secretMetadata?.map(({ key, value, isEncrypted }) => ({
               key,
               ...(isEncrypted
@@ -707,6 +709,9 @@ export const secretV2BridgeServiceFactory = ({
                   ? { encryptedValue: secretManagerEncryptor({ plainText: Buffer.from(value) }).cipherTextBlob }
                   : { value })
               })),
+              ...(inputSecret.expiresAt !== undefined
+                ? { expiresAt: inputSecret.expiresAt ? new Date(inputSecret.expiresAt) : null }
+                : {}),
               ...encryptedValue
             }
           }
@@ -4139,6 +4144,29 @@ export const secretV2BridgeServiceFactory = ({
     };
   };
 
+  const getExpiringSecrets = async ({ projectId, actor, actorId, actorOrgId, actorAuthMethod }: TProjectPermission) => {
+    await permissionService.getProjectPermission({
+      actor,
+      actorId,
+      projectId,
+      actorAuthMethod,
+      actorOrgId,
+      actionProjectType: ActionProjectType.SecretManager
+    });
+
+    const rows = await secretDAL.findExpiringByProjectId(projectId, 7);
+
+    return rows.map((s) => ({
+      id: s.id,
+      secretKey: s.key,
+      expiresAt: s.expiresAt as Date,
+      environment: s.environment,
+      environmentName: s.environmentName,
+      createdAt: s.createdAt,
+      updatedAt: s.updatedAt
+    }));
+  };
+
   return {
     createSecret,
     deleteSecret,
@@ -4162,6 +4190,7 @@ export const secretV2BridgeServiceFactory = ({
     getSecretVersionsByIds,
     findSecretIdsByFolderIdAndKeys,
     $validateSecretReferences,
-    redactSecretVersionValue
+    redactSecretVersionValue,
+    getExpiringSecrets
   };
 };

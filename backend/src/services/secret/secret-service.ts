@@ -37,7 +37,7 @@ import { logger } from "@app/lib/logger";
 import { alphaNumericNanoId } from "@app/lib/nanoid";
 import { requestMemoKeys } from "@app/lib/request-context/memo-keys";
 import { requestMemoize } from "@app/lib/request-context/request-memoizer";
-import { OrgServiceActor } from "@app/lib/types";
+import { OrgServiceActor, TProjectPermission } from "@app/lib/types";
 import {
   SecretUpdateMode,
   TDuplicateSecretDTO,
@@ -1717,7 +1717,8 @@ export const secretServiceFactory = ({
     tagIds,
     secretReminderNote,
     secretReminderRepeatDays,
-    secretMetadata
+    secretMetadata,
+    expiresAt
   }: TCreateSecretRawDTO) => {
     const { botKey, shouldUseSecretV2Bridge } = await projectBotService.getBotKey(projectId);
     const project = await requestMemoize(requestMemoKeys.projectFindById(projectId), () =>
@@ -1779,7 +1780,8 @@ export const secretServiceFactory = ({
         secretReminderNote,
         skipMultilineEncoding,
         secretReminderRepeatDays,
-        secretMetadata
+        secretMetadata,
+        expiresAt
       });
       return { secret, type: SecretProtectionType.Direct as const };
     }
@@ -1899,7 +1901,8 @@ export const secretServiceFactory = ({
     metadata,
     secretComment,
     newSecretName,
-    secretMetadata
+    secretMetadata,
+    expiresAt
   }: TUpdateSecretRawDTO) => {
     const { botKey, shouldUseSecretV2Bridge } = await projectBotService.getBotKey(projectId);
     const project = await requestMemoize(requestMemoKeys.projectFindById(projectId), () =>
@@ -1961,7 +1964,8 @@ export const secretServiceFactory = ({
         newSecretName,
         metadata,
         secretValue,
-        secretMetadata
+        secretMetadata,
+        expiresAt
       });
 
       if (secretReminderRepeatDays) {
@@ -3814,6 +3818,10 @@ export const secretServiceFactory = ({
     return secretV2BridgeService.redactSecretVersionValue({ versionId, ...rest });
   };
 
+  const getExpiringSecrets = async (dto: TProjectPermission) => {
+    return secretV2BridgeService.getExpiringSecrets(dto);
+  };
+
   return {
     attachTags,
     detachTags,
@@ -3849,6 +3857,7 @@ export const secretServiceFactory = ({
     getSecretVersionsV2ByIds,
     getChangeVersions,
     redactSecretVersionValue,
-    getSecretReferenceDependencyTree
+    getSecretReferenceDependencyTree,
+    getExpiringSecrets
   };
 };

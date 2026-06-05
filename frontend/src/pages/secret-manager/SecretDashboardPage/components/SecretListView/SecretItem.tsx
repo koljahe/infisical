@@ -44,6 +44,7 @@ import { ProjectPermissionSecretActions } from "@app/context/ProjectPermissionCo
 import { hasSecretReadValueOrDescribePermission } from "@app/lib/fn/permission";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faClock,
   faEyeSlash,
   faKey,
   faRotate,
@@ -652,6 +653,14 @@ export const SecretItem = memo(
                       </IconButton>
                     )}
                   </ProjectPermissionCan>
+                  {secret.expiresAt &&
+                    new Date(secret.expiresAt).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000 && (
+                      <Tooltip
+                        content={`Expires ${format(new Date(secret.expiresAt), "MMM d, yyyy h:mm aa")}`}
+                      >
+                        <FontAwesomeIcon icon={faClock} className="h-3.5 w-3.5 text-yellow-500" />
+                      </Tooltip>
+                    )}
                   <DropdownMenu>
                     <ProjectPermissionCan
                       I={ProjectPermissionActions.Edit}

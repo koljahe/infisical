@@ -459,7 +459,8 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
           .max(1024, "Secret reminder note cannot exceed 1024 characters")
           .optional()
           .nullable()
-          .describe(RAW_SECRETS.CREATE.secretReminderNote)
+          .describe(RAW_SECRETS.CREATE.secretReminderNote),
+        expiresAt: z.string().datetime().optional().nullable().describe("Optional expiration timestamp for the secret")
       }),
       response: {
         200: z.union([
@@ -488,7 +489,8 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
         secretMetadata: req.body.secretMetadata,
         tagIds: req.body.tagIds,
         secretReminderNote: req.body.secretReminderNote,
-        secretReminderRepeatDays: req.body.secretReminderRepeatDays
+        secretReminderRepeatDays: req.body.secretReminderRepeatDays,
+        expiresAt: req.body.expiresAt
       });
       if (secretOperation.type === SecretProtectionType.Approval) {
         await server.services.auditLog.createAuditLog({
@@ -621,7 +623,8 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
           .describe(RAW_SECRETS.UPDATE.secretReminderRepeatDays),
         secretReminderRecipients: z.string().array().optional().describe(RAW_SECRETS.UPDATE.secretReminderRecipients),
         newSecretName: SecretNameSchema.optional().describe(RAW_SECRETS.UPDATE.newSecretName),
-        secretComment: z.string().optional().describe(RAW_SECRETS.UPDATE.secretComment)
+        secretComment: z.string().optional().describe(RAW_SECRETS.UPDATE.secretComment),
+        expiresAt: z.string().datetime().optional().nullable().describe("Optional expiration timestamp for the secret")
       }),
       response: {
         200: z.union([
@@ -655,7 +658,8 @@ export const registerSecretRouter = async (server: FastifyZodProvider) => {
         metadata: req.body.metadata,
         newSecretName: req.body.newSecretName,
         secretComment: req.body.secretComment,
-        secretMetadata: req.body.secretMetadata
+        secretMetadata: req.body.secretMetadata,
+        expiresAt: req.body.expiresAt
       });
 
       if (secretOperation.type === SecretProtectionType.Approval) {

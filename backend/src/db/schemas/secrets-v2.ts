@@ -24,7 +24,8 @@ export const SecretsV2Schema = z.object({
   folderId: z.string().uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  secretValueBlindIndex: z.string().nullable().optional()
+  secretValueBlindIndex: z.string().nullable().optional(),
+  expiresAt: z.date().nullable().optional()
 });
 
 export type TSecretsV2 = z.infer<typeof SecretsV2Schema>;

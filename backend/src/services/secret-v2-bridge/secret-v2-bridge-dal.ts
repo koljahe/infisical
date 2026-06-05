@@ -1218,6 +1218,36 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
     }
   };
 
+  const findExpiringByProjectId = async (projectId: string, withinDays: number = 7) => {
+    try {
+      const now = new Date();
+      const futureDate = new Date(now.getTime() + withinDays * 24 * 60 * 60 * 1000);
+
+      const rows = await db
+        .replicaNode()(TableName.SecretV2)
+        .join(TableName.SecretFolder, `${TableName.SecretV2}.folderId`, `${TableName.SecretFolder}.id`)
+        .join(TableName.Environment, `${TableName.SecretFolder}.envId`, `${TableName.Environment}.id`)
+        .where(`${TableName.Environment}.projectId`, projectId)
+        .where(`${TableName.SecretV2}.type`, SecretType.Shared)
+        .whereNotNull(`${TableName.SecretV2}.expiresAt`)
+        .where(`${TableName.SecretV2}.expiresAt`, ">", now)
+        .where(`${TableName.SecretV2}.expiresAt`, "<=", futureDate)
+        .select(
+          db.ref("id").withSchema(TableName.SecretV2),
+          db.ref("key").withSchema(TableName.SecretV2),
+          db.ref("expiresAt").withSchema(TableName.SecretV2),
+          db.ref("createdAt").withSchema(TableName.SecretV2),
+          db.ref("updatedAt").withSchema(TableName.SecretV2),
+          db.ref("slug").withSchema(TableName.Environment).as("environment"),
+          db.ref("name").withSchema(TableName.Environment).as("environmentName")
+        );
+
+      return rows;
+    } catch (error) {
+      throw new DatabaseError({ error, name: "findExpiringByProjectId" });
+    }
+  };
+
   return {
     ...secretOrm,
     update,
@@ -1243,6 +1273,7 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
     findSecretsWithReminderRecipientsOld,
     findReferencedSecretReferencesBySecretKey,
     updateSecretReferenceSecretKey,
-    updateSecretReferenceEnvAndPath
+    updateSecretReferenceEnvAndPath,
+    findExpiringByProjectId
   };
 };
