@@ -1239,7 +1239,7 @@ const Page = () => {
           onGoBack={handleResetSnapshot}
           onClickListSnapshot={() => handlePopUpToggle("snapshots", true)}
         />
-      ))}
+      )}
     </div>
   );
 };
