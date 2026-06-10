@@ -21,6 +21,7 @@ import {
   faPaste,
   faPlus,
   faRotate,
+  faStar,
   faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -134,6 +135,8 @@ type Props = {
   onToggleTagFilter: (tagId: string) => void;
   onVisibilityToggle: () => void;
   onToggleRowType: (rowType: RowType) => void;
+  onToggleFavoritesOnly: () => void;
+  favoritesOnly: boolean;
   onClickRollbackMode: () => void;
   usedBySecretSyncs?: UsedBySecretSyncs[];
   importedBy?: {
@@ -164,6 +167,8 @@ export const ActionBar = ({
   onVisibilityToggle,
   onClickRollbackMode,
   onToggleRowType,
+  onToggleFavoritesOnly,
+  favoritesOnly,
   protectedBranchPolicyName,
   importedBy,
   isPITEnabled = false,
@@ -828,6 +833,19 @@ export const ActionBar = ({
                 <div className="flex items-center gap-2">
                   <FontAwesomeIcon icon={faKey} className="text-bunker-300" />
                   <span>Secrets</span>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.preventDefault();
+                  onToggleFavoritesOnly();
+                }}
+                icon={favoritesOnly && <FontAwesomeIcon icon={faCheckCircle} />}
+                iconPos="right"
+              >
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faStar} className="text-yellow-500" />
+                  <span>Favorites only</span>
                 </div>
               </DropdownMenuItem>
               {Boolean(tags.length) && (

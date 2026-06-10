@@ -59,6 +59,7 @@ import { useGetFolderCommitsCount } from "@app/hooks/api/folderCommits";
 import { OrderByDirection } from "@app/hooks/api/generic/types";
 import { ProjectType, ProjectVersion } from "@app/hooks/api/projects/types";
 import { queryClient } from "@app/hooks/api/reactQuery";
+import { useGetSecretFavorites } from "@app/hooks/api/secretFavorites";
 import { PendingAction } from "@app/hooks/api/secretFolders/types";
 import { useCreateCommit } from "@app/hooks/api/secrets/mutations";
 import { SecretV3RawSanitized } from "@app/hooks/api/types";
@@ -283,7 +284,9 @@ const Page = () => {
   const defaultFilterState = getFilterStateFromQueryParams();
 
   const [filter, setFilter] = useState<Filter>(defaultFilterState);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [debouncedSearchFilter, setDebouncedSearchFilter] = useDebounce(filter.searchFilter);
+  const { data: favoriteSecretIds } = useGetSecretFavorites(projectId);
 
   const createSecretPopUp = usePopUpState(PopUpNames.CreateSecretForm);
   const { togglePopUp } = usePopUpAction();
@@ -836,7 +839,20 @@ const Page = () => {
     return mergedFolders;
   };
 
-  const mergedSecrets = getMergedSecretsWithPending();
+  const allMergedSecrets = getMergedSecretsWithPending();
+  const mergedSecrets = (() => {
+    if (!allMergedSecrets) return allMergedSecrets;
+    const filtered =
+      favoritesOnly && favoriteSecretIds
+        ? allMergedSecrets.filter((s) => favoriteSecretIds.has(s.id))
+        : allMergedSecrets;
+    if (!favoriteSecretIds || favoritesOnly) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aFav = favoriteSecretIds.has(a.id) ? 0 : 1;
+      const bFav = favoriteSecretIds.has(b.id) ? 0 : 1;
+      return aFav - bFav;
+    });
+  })();
   const mergedFolders = getMergedFoldersWithPending();
 
   if (!(currentProject?.version === ProjectVersion.V3))
@@ -922,6 +938,8 @@ const Page = () => {
             snapshotCount={changesCount || 0}
             isSnapshotCountLoading={isChangesCountPending && isChangesCountFetching}
             onToggleRowType={handleToggleRowType}
+            onToggleFavoritesOnly={() => setFavoritesOnly((prev) => !prev)}
+            favoritesOnly={favoritesOnly}
             onClickRollbackMode={handleOnClickRollbackMode}
             protectedBranchPolicyName={boardPolicy?.name}
             importedBy={importedBy}

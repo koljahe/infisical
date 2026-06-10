@@ -31,11 +31,13 @@ import {
   useProjectPermission
 } from "@app/context";
 import { usePopUp, useToggle } from "@app/hooks";
+import { useGetSecretFavorites, useToggleSecretFavorite } from "@app/hooks/api/secretFavorites";
 import { SecretV3RawSanitized } from "@app/hooks/api/secrets/types";
 import { WsTag } from "@app/hooks/api/types";
 import { subject } from "@casl/ability";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { memo, useCallback, useEffect, useRef } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
@@ -124,6 +126,8 @@ export const SecretItem = memo(
     const { currentProject } = useProject();
     const { permission } = useProjectPermission();
     const { removePendingChange } = useBatchModeActions();
+    const { data: favoriteSecretIds } = useGetSecretFavorites(currentProject.id);
+    const toggleFavoriteMutation = useToggleSecretFavorite();
 
     const [isFieldFocused, setIsFieldFocused] = useToggle();
 
@@ -463,6 +467,28 @@ export const SecretItem = memo(
                 </>
               )}
             </div>
+            <button
+              type="button"
+              className="flex h-11 w-7 shrink-0 items-center justify-center text-mineshaft-400 hover:text-yellow-500"
+              onClick={(e) => {
+                e.stopPropagation();
+                const isFav = favoriteSecretIds?.has(secret.id) ?? false;
+                toggleFavoriteMutation.mutate({
+                  secretId: secret.id,
+                  projectId: currentProject.id,
+                  isFavorite: !isFav
+                });
+              }}
+            >
+              <Star
+                size={14}
+                className={twMerge(
+                  "transition-colors",
+                  favoriteSecretIds?.has(secret.id) ? "text-yellow-500" : ""
+                )}
+                fill={favoriteSecretIds?.has(secret.id) ? "currentColor" : "none"}
+              />
+            </button>
             <div className="flex h-11 shrink-0 items-center px-4 py-2" style={{ width: colWidth }}>
               <Controller
                 name="key"
