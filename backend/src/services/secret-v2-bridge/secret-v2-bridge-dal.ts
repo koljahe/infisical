@@ -393,6 +393,7 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
 
       const secs = await (tx || db.replicaNode())(TableName.SecretV2)
         .where({ folderId })
+        .whereNull(`${TableName.SecretV2}.archivedAt`)
         .where((bd) => {
           void bd
             .whereNull(`${TableName.SecretV2}.userId`)
@@ -585,6 +586,7 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
 
       const query = (tx || db.replicaNode())(TableName.SecretV2)
         .whereIn(`${TableName.SecretV2}.folderId`, folderIds)
+        .whereNull(`${TableName.SecretV2}.archivedAt`)
         .where((bd) => {
           if (filters?.search) {
             void bd.whereILike(`${TableName.SecretV2}.key`, `%${filters?.search}%`);
@@ -1200,6 +1202,18 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
     }
   };
 
+  const findArchivedByFolderId = async (folderId: string, tx?: Knex) => {
+    try {
+      const docs = await (tx || db.replicaNode())(TableName.SecretV2)
+        .where({ folderId })
+        .whereNotNull("archivedAt")
+        .select(selectAllTableCols(TableName.SecretV2));
+      return docs;
+    } catch (error) {
+      throw new DatabaseError({ error, name: `${TableName.SecretV2}: FindArchivedByFolderId` });
+    }
+  };
+
   const countStaleByProject = async (projectId: string, staleBeforeDate: Date, tx?: Knex) => {
     try {
       const result = await (tx || db.replicaNode())(TableName.SecretV2)
@@ -1234,6 +1248,7 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
     findReferencedSecretReferences,
     findAllProjectSecretValues,
     countByFolderIds,
+    findArchivedByFolderId,
     findStaleByProject,
     countStaleByProject,
     findOne,

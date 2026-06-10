@@ -10,6 +10,7 @@ import { HIDDEN_SECRET_VALUE } from "@app/pages/secret-manager/SecretDashboardPa
 
 import { ERROR_NOT_ALLOWED_READ_SECRETS } from "./constants";
 import {
+  ArchivedSecret,
   GetSecretVersionsDTO,
   SecretAccessListEntry,
   SecretAccessListGroupEntry,
@@ -25,6 +26,7 @@ import {
   TGetSecretReferencesDTO,
   TGetSecretReferenceTreeDTO,
   TGetSecretVersionValue,
+  TListArchivedSecretsDTO,
   TSecretDependencyTreeNode,
   TSecretReferenceTraceNode,
   TSecretVersionValue
@@ -54,7 +56,9 @@ export const secretKeys = {
       { projectId, environment, secretPath, secretKey, includeAllEntities }
     ] as const,
   getSecretReferenceTree: (dto: TGetSecretReferenceTreeDTO) => ["secret-reference-tree", dto],
-  getSecretReferences: (dto: TGetSecretReferencesDTO) => ["secret-references", dto]
+  getSecretReferences: (dto: TGetSecretReferencesDTO) => ["secret-references", dto],
+  getArchivedSecrets: ({ projectId, environment, secretPath }: { projectId: string; environment: string; secretPath: string }) =>
+    [{ projectId, environment, secretPath }, "archived-secrets"] as const
 };
 
 export const fetchProjectSecrets = async ({
@@ -378,4 +382,30 @@ export const useGetSecretReferences = (
       Boolean(dto.secretKey),
     queryKey: secretKeys.getSecretReferences(dto),
     queryFn: () => fetchSecretReferences(dto)
+  });
+
+const fetchArchivedSecrets = async (dto: TListArchivedSecretsDTO) => {
+  const { data } = await apiRequest.get<{ secrets: ArchivedSecret[] }>(
+    `/api/v1/projects/${dto.projectId}/secrets/archived`,
+    {
+      params: {
+        environment: dto.environment,
+        secretPath: dto.secretPath
+      }
+    }
+  );
+  return data.secrets;
+};
+
+export const useGetArchivedSecrets = (
+  dto: TListArchivedSecretsDTO,
+  options?: { enabled?: boolean }
+) =>
+  useQuery({
+    enabled:
+      (options?.enabled ?? true) &&
+      Boolean(dto.projectId) &&
+      Boolean(dto.environment),
+    queryKey: secretKeys.getArchivedSecrets(dto),
+    queryFn: () => fetchArchivedSecrets(dto)
   });
