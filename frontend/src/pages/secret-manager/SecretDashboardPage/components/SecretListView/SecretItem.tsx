@@ -46,6 +46,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEyeSlash,
   faKey,
+  faLock,
   faRotate,
   faShieldHalved,
   faWarning
@@ -158,7 +159,7 @@ export const SecretItem = memo(
       valueOverride: originalSecret.valueOverride ?? secretValueData?.valueOverride
     };
 
-    const { isRotatedSecret, isHoneyTokenSecret } = secret;
+    const { isRotatedSecret, isHoneyTokenSecret, isLocked } = secret;
     const isManagedSecret = isRotatedSecret || isHoneyTokenSecret;
 
     const autoSaveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -320,6 +321,7 @@ export const SecretItem = memo(
     const isReadOnlySecret =
       isReadOnly ||
       isManagedSecret ||
+      isLocked ||
       (isPending && pendingAction === PendingAction.Delete) ||
       isLoadingSecretValue;
 
@@ -470,7 +472,7 @@ export const SecretItem = memo(
                 render={({ field, fieldState: { error } }) => (
                   <Input
                     autoComplete="off"
-                    isReadOnly={isReadOnly || isManagedSecret}
+                    isReadOnly={isReadOnly || isManagedSecret || isLocked}
                     autoCapitalization={currentProject?.autoCapitalization}
                     variant="plain"
                     isDisabled={isOverridden}
@@ -506,6 +508,11 @@ export const SecretItem = memo(
                   />
                 )}
               />
+              {isLocked && (
+                <Tooltip content="This secret is locked">
+                  <FontAwesomeIcon icon={faLock} className="ml-2 text-yellow-600" size="sm" />
+                </Tooltip>
+              )}
             </div>
             <div
               className="flex w-80 grow items-center border-x border-mineshaft-600 py-1 pr-2 pl-4"
@@ -1022,11 +1029,13 @@ export const SecretItem = memo(
                       allowedLabel={
                         isOverridden
                           ? "Unavailable with override"
-                          : isHoneyTokenSecret
-                            ? "Cannot Delete Honey Token Secret"
-                            : isRotatedSecret
-                              ? "Cannot Delete Rotated Secret"
-                              : "Delete"
+                          : isLocked
+                            ? "Secret is locked"
+                            : isHoneyTokenSecret
+                              ? "Cannot Delete Honey Token Secret"
+                              : isRotatedSecret
+                                ? "Cannot Delete Rotated Secret"
+                                : "Delete"
                       }
                     >
                       {(isAllowed) => (
@@ -1037,7 +1046,7 @@ export const SecretItem = memo(
                           size="md"
                           className="p-0 opacity-0 group-hover:opacity-100"
                           onClick={() => onDeleteSecret(secret)}
-                          isDisabled={!isAllowed || isManagedSecret || isOverridden}
+                          isDisabled={!isAllowed || isManagedSecret || isOverridden || isLocked}
                         >
                           <FontAwesomeSymbol
                             symbolName={FontAwesomeSpriteName.Trash}

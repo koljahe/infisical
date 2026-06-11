@@ -105,7 +105,8 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
           ...SecretsV2Schema.parse(el),
           isHoneyTokenSecret: Boolean(el.honeyTokenId),
           isRotatedSecret: Boolean(el.rotationId),
-          rotationId: el.rotationId
+          rotationId: el.rotationId,
+          isLocked: Boolean(el.isLocked)
         }),
         childrenMapper: [
           {
@@ -210,6 +211,7 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
           isHoneyTokenSecret: Boolean(el.honeyTokenId),
           rotationId: el.rotationId,
           isRotatedSecret: Boolean(el.rotationId),
+          isLocked: Boolean(el.isLocked),
           projectId: el.environmentProjectId
         }),
         childrenMapper: [
@@ -711,7 +713,8 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
           ...SecretsV2Schema.parse(el),
           isHoneyTokenSecret: Boolean(el.honeyTokenId),
           rotationId: el.rotationId,
-          isRotatedSecret: Boolean(el.rotationId)
+          isRotatedSecret: Boolean(el.rotationId),
+          isLocked: Boolean(el.isLocked)
         }),
         childrenMapper: [
           {
@@ -823,7 +826,8 @@ export const secretV2BridgeDALFactory = ({ db, keyStore }: TSecretV2DalArg) => {
         parentMapper: (secret) => ({
           ...secret,
           isHoneyTokenSecret: Boolean(secret.honeyTokenId),
-          isRotatedSecret: Boolean(secret.rotationId)
+          isRotatedSecret: Boolean(secret.rotationId),
+          isLocked: Boolean(secret.isLocked)
         }),
         childrenMapper: [
           {

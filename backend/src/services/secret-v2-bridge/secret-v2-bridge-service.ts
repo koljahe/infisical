@@ -562,6 +562,12 @@ export const secretV2BridgeServiceFactory = ({
         }
       }
 
+      if (sharedSecretToModify.isLocked) {
+        throw new ForbiddenRequestError({
+          message: "Secret is locked and cannot be updated. Unlock it first to make changes."
+        });
+      }
+
       secretId = sharedSecretToModify.id;
       secret = sharedSecretToModify;
     }
@@ -856,6 +862,12 @@ export const secretV2BridgeServiceFactory = ({
     if (inputSecret.type === SecretType.Shared) {
       if (secretToDelete.isHoneyTokenSecret)
         throw new BadRequestError({ message: "Cannot delete honey token secrets" });
+    }
+
+    if (secretToDelete.isLocked) {
+      throw new ForbiddenRequestError({
+        message: "Secret is locked and cannot be deleted. Unlock it first to make changes."
+      });
     }
 
     if (secretToDelete.type !== SecretType.Personal)
@@ -2285,6 +2297,13 @@ export const secretV2BridgeServiceFactory = ({
         const secretsToCreate = secretsToUpdate.filter((el) => !secretsToUpdateInDBGroupedByKey?.[el.secretKey]);
         secretsToUpdate = secretsToUpdate.filter((el) => secretsToUpdateInDBGroupedByKey?.[el.secretKey]);
 
+        const lockedSecrets = secretsToUpdateInDB.filter((el) => el.isLocked);
+        if (lockedSecrets.length > 0) {
+          throw new ForbiddenRequestError({
+            message: `Cannot update locked secret(s): ${lockedSecrets.map((el) => el.key).join(", ")}. Unlock them first.`
+          });
+        }
+
         secretsToUpdateInDB.forEach((el) => {
           ForbiddenError.from(permission).throwUnlessCan(
             ProjectPermissionSecretActions.Edit,
@@ -2727,6 +2746,13 @@ export const secretV2BridgeServiceFactory = ({
         })
       );
     });
+    const lockedSecretsToDelete = secretsToDelete.filter((el) => el.isLocked);
+    if (lockedSecretsToDelete.length) {
+      throw new ForbiddenRequestError({
+        message: `Cannot delete locked secret(s): ${lockedSecretsToDelete.map((el) => el.key).join(", ")}. Unlock them first.`
+      });
+    }
+
     const honeyTokenSecretsToDelete = secretsToDelete.filter((el) => el.isHoneyTokenSecret);
     if (honeyTokenSecretsToDelete.length) {
       throw new BadRequestError({

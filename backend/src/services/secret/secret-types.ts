@@ -296,6 +296,13 @@ export type TDeleteSecretRawDTO = TProjectPermission & {
   type: SecretType;
 };
 
+export type TToggleSecretLockDTO = TProjectPermission & {
+  secretId: string;
+  isLocked: boolean;
+  environment: string;
+  secretPath: string;
+};
+
 export type TCreateManySecretRawDTO = Omit<TProjectPermission, "projectId"> & {
   secretPath: string;
   projectId?: string;

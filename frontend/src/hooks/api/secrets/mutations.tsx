@@ -20,6 +20,7 @@ import {
   TDuplicateSecretDTO,
   TDuplicateSecretResponse,
   TMoveSecretsDTO,
+  TToggleSecretLockDTO,
   TUpdateSecretBatchDTO,
   TUpdateSecretsV3DTO
 } from "./types";
@@ -696,6 +697,29 @@ export const useRedactSecretValue = () => {
     },
     onSuccess: (_, { secretId }) => {
       queryClient.invalidateQueries({ queryKey: secretKeys.getSecretVersion(secretId) });
+    }
+  });
+};
+
+export const useToggleSecretLock = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ secret: { id: string; isLocked: boolean } }, object, TToggleSecretLockDTO>({
+    mutationFn: async ({ secretId, isLocked, projectId, environment, secretPath }) => {
+      const { data } = await apiRequest.patch(`/api/v1/secrets/${secretId}/lock`, {
+        isLocked,
+        projectId,
+        environment,
+        secretPath
+      });
+      return data;
+    },
+    onSuccess: (_, { projectId, environment, secretPath }) => {
+      queryClient.invalidateQueries({
+        queryKey: secretKeys.getProjectSecret({ projectId, environment, secretPath })
+      });
+      queryClient.invalidateQueries({
+        queryKey: dashboardKeys.getDashboardSecrets({ projectId, secretPath })
+      });
     }
   });
 };
