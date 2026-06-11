@@ -51,6 +51,7 @@ export type SecretV3RawSanitized = {
   reminder?: Reminder;
   isEmpty?: boolean;
   isOverrideEmpty?: boolean;
+  expiresAt?: string | null;
 };
 
 export type SecretV3Raw = {
@@ -79,6 +80,7 @@ export type SecretV3Raw = {
   secretReminderRecipients?: SecretReminderRecipient[];
   reminder?: Reminder;
   isEmpty?: boolean;
+  expiresAt?: string | null;
 };
 
 export type SecretV3RawResponse = {
@@ -180,6 +182,7 @@ export type TCreateSecretsV3DTO = {
   type: SecretType;
   tagIds?: string[];
   secretMetadata?: { key: string; value: string; isEncrypted?: boolean }[];
+  expiresAt?: string | null;
 };
 
 export type TUpdateSecretsV3DTO = {
@@ -197,6 +200,7 @@ export type TUpdateSecretsV3DTO = {
   tagIds?: string[];
   secretMetadata?: { key: string; value: string; isEncrypted?: boolean }[];
   secretReminderRecipients?: string[] | null;
+  expiresAt?: string | null;
 };
 
 export type TDeleteSecretsV3DTO = {
@@ -344,4 +348,18 @@ export type SecretAccessListEntry = {
 export type SecretAccessListGroupEntry = SecretAccessListEntry & {
   userIds: string[];
   identityIds: string[];
+};
+
+export type TExpiringSecret = {
+  id: string;
+  secretKey: string;
+  expiresAt: string;
+  environment: string;
+  environmentName: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TGetExpiringSecretsDTO = {
+  projectId: string;
 };

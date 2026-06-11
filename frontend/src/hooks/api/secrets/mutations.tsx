@@ -41,7 +41,8 @@ export const useCreateSecretV3 = ({
       secretComment,
       skipMultilineEncoding,
       tagIds,
-      secretMetadata
+      secretMetadata,
+      expiresAt
     }) => {
       const { data } = await apiRequest.post(`/api/v4/secrets/${encodeURIComponent(secretKey)}`, {
         secretPath,
@@ -52,7 +53,8 @@ export const useCreateSecretV3 = ({
         secretComment,
         skipMultilineEncoding,
         tagIds,
-        secretMetadata
+        secretMetadata,
+        expiresAt
       });
       return data;
     },
@@ -111,7 +113,8 @@ export const useUpdateSecretV3 = ({
       secretReminderRecipients,
       newSecretName,
       skipMultilineEncoding,
-      secretMetadata
+      secretMetadata,
+      expiresAt
     }) => {
       const { data } = await apiRequest.patch(`/api/v4/secrets/${encodeURIComponent(secretKey)}`, {
         projectId,
@@ -126,7 +129,8 @@ export const useUpdateSecretV3 = ({
         secretComment,
         tagIds,
         secretValue,
-        secretMetadata
+        secretMetadata,
+        expiresAt
       });
       return data;
     },

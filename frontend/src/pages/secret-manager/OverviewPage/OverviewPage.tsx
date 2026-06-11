@@ -207,6 +207,7 @@ import {
 } from "../SecretDashboardPage/SecretMainPage.store";
 import { AddResourceButtons } from "./components/AddResourceButtons/AddResourceButtons";
 import { CreateSecretForm } from "./components/CreateSecretForm";
+import { ExpiringSoonPanel } from "./components/ExpiringSoonPanel";
 import { ImportSecretsModal, SecretDropzone } from "./components/SecretDropzone";
 import { SecretV2MigrationSection } from "./components/SecretV2MigrationSection";
 import { SelectionPanel } from "./components/SelectionPanel/SelectionPanel";
@@ -2501,6 +2502,8 @@ const OverviewPageContent = () => {
           usedBySecretSyncs={usedBySecretSyncs}
           visibleEnvs={visibleEnvs}
         />
+
+        <ExpiringSoonPanel projectId={projectId} />
 
         <Card>
           <CardHeader>

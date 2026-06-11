@@ -769,6 +769,35 @@ export const SecretDetailSidebar = ({
                 </FormControl>
               )}
             />
+            <Controller
+              control={control}
+              name="expiresAt"
+              render={({ field }) => (
+                <FormControl label="Expires At" className="mb-2">
+                  <div>
+                    <Input
+                      type="datetime-local"
+                      className="border border-mineshaft-600 bg-mineshaft-900 text-sm"
+                      readOnly={isReadOnly}
+                      value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val ? new Date(val).toISOString() : null);
+                      }}
+                    />
+                    {field.value && !isReadOnly && (
+                      <button
+                        type="button"
+                        className="mt-1 text-xs text-red-400 hover:text-red-300"
+                        onClick={() => field.onChange(null)}
+                      >
+                        Clear expiry
+                      </button>
+                    )}
+                  </div>
+                </FormControl>
+              )}
+            />
             <div className="dark flex max-h-96 flex-1 cursor-default flex-col text-sm text-bunker-300">
               <div className="mb-0.5 text-mineshaft-400">Version History</div>
               <div className="flex thin-scrollbar flex-1 flex-col space-y-2 overflow-x-hidden overflow-y-auto rounded-md border border-mineshaft-600 bg-mineshaft-900 p-4 dark:scheme-dark">

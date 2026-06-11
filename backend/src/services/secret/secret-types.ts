@@ -268,6 +268,7 @@ export type TCreateSecretRawDTO = TProjectPermission & {
   secretReminderRepeatDays?: number | null;
   secretReminderNote?: string | null;
   secretMetadata?: ResourceMetadataWithEncryptionDTO;
+  expiresAt?: string | null;
 };
 
 export type TUpdateSecretRawDTO = TProjectPermission & {
@@ -287,6 +288,7 @@ export type TUpdateSecretRawDTO = TProjectPermission & {
     source?: string;
   };
   secretMetadata?: ResourceMetadataWithEncryptionDTO;
+  expiresAt?: string | null;
 };
 
 export type TDeleteSecretRawDTO = TProjectPermission & {

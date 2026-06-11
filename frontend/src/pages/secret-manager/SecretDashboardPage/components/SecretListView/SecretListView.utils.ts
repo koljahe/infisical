@@ -64,7 +64,8 @@ export const formSchema = z.object({
     })
     .array()
     .default([])
-    .optional()
+    .optional(),
+  expiresAt: z.string().nullable().optional()
 });
 
 export type TFormSchema = z.infer<typeof formSchema>;

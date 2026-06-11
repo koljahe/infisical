@@ -56,7 +56,8 @@ export const fnSecretBulkInsert = async ({
       reminderNote,
       encryptedValue,
       reminderRepeatDays,
-      secretValueBlindIndex
+      secretValueBlindIndex,
+      expiresAt
     }) => ({
       skipMultilineEncoding,
       type,
@@ -67,7 +68,8 @@ export const fnSecretBulkInsert = async ({
       reminderNote,
       encryptedValue,
       reminderRepeatDays,
-      secretValueBlindIndex
+      secretValueBlindIndex,
+      expiresAt
     })
   );
 
@@ -630,6 +632,7 @@ export const reshapeBridgeSecret = (
   isHoneyTokenSecret: secret.isHoneyTokenSecret,
   rotationId: secret.rotationId,
   secretReminderRecipients: secret.secretReminderRecipients || [],
+  expiresAt: secret.expiresAt || null,
   ...(secretValueHidden
     ? {
         secretValue: secret.type === SecretType.Personal ? secret.value : INFISICAL_SECRET_VALUE_HIDDEN_MASK,

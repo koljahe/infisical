@@ -12,6 +12,7 @@ export {
 } from "./mutations";
 export {
   fetchSecretReferences,
+  useGetExpiringSecrets,
   useGetProjectSecrets,
   useGetProjectSecretsAllEnv,
   useGetSecretReferences,

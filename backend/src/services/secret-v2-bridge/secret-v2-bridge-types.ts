@@ -91,6 +91,7 @@ export type TCreateSecretDTO = TProjectPermission & {
   secretReminderRepeatDays?: number | null;
   secretReminderNote?: string | null;
   secretMetadata?: ResourceMetadataWithEncryptionDTO;
+  expiresAt?: string | null;
 };
 
 export type TUpdateSecretDTO = TProjectPermission & {
@@ -110,6 +111,7 @@ export type TUpdateSecretDTO = TProjectPermission & {
     source?: string;
   };
   secretMetadata?: ResourceMetadataWithEncryptionDTO;
+  expiresAt?: string | null;
 };
 
 export type TDeleteSecretDTO = TProjectPermission & {

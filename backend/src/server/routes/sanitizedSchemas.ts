@@ -163,7 +163,8 @@ export const secretRawSchema = z.object({
     .optional()
     .nullable(),
   isRotatedSecret: z.boolean().optional(),
-  rotationId: z.string().uuid().nullish()
+  rotationId: z.string().uuid().nullish(),
+  expiresAt: z.date().nullable().optional()
 });
 
 export const ProjectPermissionSchema = z.object({
